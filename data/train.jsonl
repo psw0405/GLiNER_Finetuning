@@ -1,0 +1,9 @@
+{"text": "삼성전자는 2024년 3월 15일에 서울 강남구에서 신제품 발표회를 열었다.", "entities": [{"start": 0, "end": 4, "label": "Organization"}, {"start": 6, "end": 18, "label": "Date"}, {"start": 20, "end": 22, "label": "LocationCity"}, {"start": 23, "end": 25, "label": "LocationCity"}]}
+{"text": "기획재정부는 이번 정책으로 물가 안정을 도모할 방침이다.", "entities": [{"start": 0, "end": 5, "label": "Organization"}]}
+{"text": "한국은 미국과 일본 등 주요 7개국과의 협력 강화에 나섰다.", "entities": [{"start": 0, "end": 2, "label": "LocationCountry"}, {"start": 4, "end": 6, "label": "LocationCountry"}, {"start": 8, "end": 10, "label": "LocationCountry"}]}
+{"text": "부산 해운대에서 열린 국제영화제에는 3만 명이 방문했다.", "entities": [{"start": 0, "end": 2, "label": "LocationCity"}, {"start": 3, "end": 6, "label": "LocationCity"}]}
+{"text": "이번 거래 금액은 총 1억 5,000만 원으로 알려졌다.", "entities": [{"start": 12, "end": 15, "label": "QuantityPrice"}, {"start": 17, "end": 23, "label": "QuantityPrice"}]}
+{"text": "기온이 -3.5도로 떨어지면서 강풍 주의보가 발령됐다.", "entities": [{"start": 3, "end": 9, "label": "QunatityTemperature"}]}
+{"text": "그는 만 45세에 대표이사직에 오른 최연소 기록을 세웠다.", "entities": [{"start": 3, "end": 8, "label": "QuantityAge"}]}
+{"text": "오전 9시 30분에 회의가 시작될 예정이다.", "entities": [{"start": 0, "end": 9, "label": "Time"}]}
+{"text": "올해 5월 행사는 3주간 진행되며 다양한 문화 프로그램이 마련됐다.", "entities": [{"start": 10, "end": 13, "label": "DateDuraion"}]}

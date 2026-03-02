@@ -1,0 +1,43 @@
+# Organization-name suffix dictionary.
+# Tokens (eojeol-final characters/strings) that indicate an organization name.
+# One suffix per line; lines starting with '#' are ignored.
+# The labeler matches any Korean token whose surface form *ends with* one of
+# these suffixes (minimum prefix length of 2 characters is enforced to avoid
+# spurious matches on single-character tokens).
+부
+청
+처
+위원회
+공사
+공단
+연구원
+재단
+협회
+은행
+증권
+그룹
+기업
+산업
+건설
+전자
+통신
+서비스
+시스템
+솔루션
+파트너스
+인베스트먼트
+캐피탈
+홀딩스
+미디어
+방송
+신문
+출판
+교육원
+학원
+병원
+의원
+약국
+센터
+클리닉
+연구소
+기술원
