@@ -1,0 +1,19 @@
+# GLiNER Finetuning – Hyperparameter Configuration
+# All values can be overridden via CLI arguments in src/train.py
+
+# Base model to finetune
+base_model: "urchade/gliner_small-v2"
+
+# Dataset paths (relative to repo root)
+train: "data/train.jsonl"
+valid: "data/valid.jsonl"
+
+# Output directory for checkpoints and final model
+output_dir: "outputs/run1"
+
+# Training hyperparameters
+epochs: 3
+lr: 5.0e-6
+batch_size: 4         # keep low for CPU-only training
+max_length: 384       # max token length per document
+seed: 42

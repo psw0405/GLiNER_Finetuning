@@ -7,3 +7,5 @@ data/raw/
 data/interim/
 data/processed/
 outputs/
+!outputs/.gitkeep
+!data/.gitkeep
