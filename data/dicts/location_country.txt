@@ -1,0 +1,44 @@
+# Built-in country name dictionary (Korean).
+# One entry per line; lines starting with '#' are ignored.
+# Add additional country names here, one per line.
+미국
+중국
+일본
+한국
+러시아
+프랑스
+독일
+영국
+북한
+캐나다
+호주
+인도
+이탈리아
+스페인
+브라질
+멕시코
+아르헨티나
+사우디아라비아
+터키
+네덜란드
+스위스
+스웨덴
+노르웨이
+덴마크
+핀란드
+폴란드
+우크라이나
+이란
+이라크
+이스라엘
+남아프리카
+이집트
+나이지리아
+케냐
+태국
+베트남
+인도네시아
+필리핀
+말레이시아
+싱가포르
+뉴질랜드
