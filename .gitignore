@@ -8,6 +8,7 @@ data/interim/
 data/processed/
 data/*.jsonl
 data/raw_sentences.txt
+data/*.xlsx
 outputs/
 !outputs/.gitkeep
 !data/.gitkeep
