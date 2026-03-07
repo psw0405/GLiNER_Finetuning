@@ -16,7 +16,13 @@ import argparse
 import sys
 from pathlib import Path
 
-import openpyxl
+try:
+    import openpyxl
+except ModuleNotFoundError as exc:
+    openpyxl = None
+    _OPENPYXL_IMPORT_ERROR = exc
+else:
+    _OPENPYXL_IMPORT_ERROR = None
 
 
 def convert_xlsx_to_txt(
@@ -45,6 +51,12 @@ def convert_xlsx_to_txt(
     int
         Number of sentences written.
     """
+    if openpyxl is None:
+        raise RuntimeError(
+            "The 'openpyxl' package is required to read .xlsx files. "
+            "Install project dependencies with 'python -m pip install -r requirements.txt'."
+        ) from _OPENPYXL_IMPORT_ERROR
+
     wb = openpyxl.load_workbook(input_path, read_only=True, data_only=True)
 
     if sheet is None:
@@ -170,13 +182,17 @@ def main() -> None:
         except ValueError:
             pass  # keep as str
 
-    count = convert_xlsx_to_txt(
-        input_path=input_path,
-        output_path=output_path,
-        column=column,
-        sheet=sheet,
-        skip_header=args.skip_header,
-    )
+    try:
+        count = convert_xlsx_to_txt(
+            input_path=input_path,
+            output_path=output_path,
+            column=column,
+            sheet=sheet,
+            skip_header=args.skip_header,
+        )
+    except RuntimeError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        sys.exit(1)
 
     print(f"written={count} output={output_path}")
 
