@@ -1,0 +1,55 @@
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|##########| 4/4 [00:00<?, ?it/s]
+C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\convert_slow_tokenizer.py:560: UserWarning: The sentencepiece tokenizer that you are converting to a fast tokenizer uses the byte fallback option which is not implemented in the fast tokenizers. In practice this means that the fast version of the tokenizer can produce unknown tokens whereas the sentencepiece version would have converted these unknown tokens into a sequence of byte tokens matching the original piece of text.
+  warnings.warn(
+C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\huggingface_hub\file_download.py:949: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\training_args.py:1474: FutureWarning: `evaluation_strategy` is deprecated and will be removed in version 4.46 of \U0001f917 Transformers. Use `eval_strategy` instead
+  warnings.warn(
+C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\training_args.py:1489: FutureWarning: using `no_cuda` is deprecated and will be removed in version 5.0 of \U0001f917 Transformers. Use `use_cpu` instead
+  warnings.warn(
+  0%|          | 0/258 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 176, in train
+    _train_via_trainer(
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 293, in _train_via_trainer
+    trainer.train()
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\trainer.py", line 1885, in train
+    return inner_training_loop(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\trainer.py", line 2178, in _inner_training_loop
+    for step, inputs in enumerate(epoch_iterator):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\accelerate\data_loader.py", line 454, in __iter__
+    current_batch = next(dataloader_iter)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\torch\utils\data\dataloader.py", line 741, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\torch\utils\data\dataloader.py", line 801, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 57, in fetch
+    return self.collate_fn(data)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\data\data_collator.py", line 92, in default_data_collator
+    return torch_default_data_collator(features)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\.venv\Lib\site-packages\transformers\data\data_collator.py", line 158, in torch_default_data_collator
+    batch[k] = torch.tensor([f[k] for f in features])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many dimensions 'str'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 455, in <module>
+    main()
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 441, in main
+    train(
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 193, in train
+    _train_manual(
+  File "C:\Users\sungw\git_repo\GLiNER_Finetuning\src\train.py", line 381, in _train_manual
+    raise RuntimeError(
+RuntimeError: Manual training loop executed zero optimization steps in an epoch. collate_failures=86, forward_failures=0, records=341, batch_size=4.
+  0%|          | 0/258 [00:00<?, ?it/s]

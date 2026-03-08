@@ -3,12 +3,12 @@ Inference script: load a saved GLiNER model and extract entities from text.
 
 Usage:
     python -m src.predict \\
-        --model_dir outputs/run1/final \\
+        --model_dir outputs/<run>/final \\
         --text "Alice met Bob in Paris on Monday."
 
     # Or provide a JSONL file:
     python -m src.predict \\
-        --model_dir outputs/run1/final \\
+        --model_dir outputs/<run>/final \\
         --input_file data/valid.jsonl \\
         --output_file predictions.jsonl
 """
@@ -75,7 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model_dir", type=Path, required=True,
-        help="Path to saved model directory (e.g. outputs/run1/final)."
+        help="Path to saved model directory (e.g. outputs/run2/final)."
     )
     parser.add_argument(
         "--text", type=str, default=None,

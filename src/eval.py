@@ -3,7 +3,7 @@ Evaluation script: compute precision, recall and F1 on a validation set.
 
 Usage:
     python -m src.eval \\
-        --model_dir outputs/run1/final \\
+        --model_dir outputs/<run>/final \\
         --valid data/valid.jsonl
 """
 
@@ -124,7 +124,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model_dir", type=Path, required=True,
-        help="Path to saved model directory (e.g. outputs/run1/final)."
+        help="Path to saved model directory (e.g. outputs/run2/final)."
     )
     parser.add_argument(
         "--valid", type=Path, default=Path("data/valid.jsonl"),
