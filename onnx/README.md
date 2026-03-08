@@ -115,3 +115,34 @@ cmake -S . -B build \
 ```
 
 출력은 JSON 배열이며 각 항목은 `start`, `end`, `label`, `text`, `score`를 포함합니다.
+
+## 5) Python vs C++ Parity 자동 비교
+
+같은 입력/옵션으로 Python(GLiNER ONNX)과 C++(`gliner_tizen_demo`) 결과를 자동 비교합니다.
+
+기본 실행(바이너리 자동 탐색):
+
+```bash
+python onnx/parity_test.py \
+   --model_dir onnx \
+   --threshold 0.5
+```
+
+텍스트 여러 개 비교:
+
+```bash
+python onnx/parity_test.py \
+   --model_dir onnx \
+   --text "삼성전자는 서울에서 신제품을 공개했다." \
+   --text "홍길동은 부산에서 회의를 열었다."
+```
+
+바이너리 경로 직접 지정:
+
+```bash
+python onnx/parity_test.py \
+   --model_dir onnx \
+   --cpp_bin onnx/cpp/build/gliner_tizen_demo.exe
+```
+
+불일치 시 exit code 1로 종료하고, 누락 엔티티/score 차이를 출력합니다.
