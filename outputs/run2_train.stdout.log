@@ -1,0 +1,120 @@
+Loading training data ¡¦
+
+--- Train ---
+  Records : 341
+  Spans   : 216
+  Avg len : 54.4 chars
+  Label counts:
+    LocationCountry              93
+    LocationCity                 36
+    QuantityPrice                31
+    Organization                 27
+    Date                         8
+    QuantityAge                  7
+    TimeDuration                 6
+    DateDuraion                  6
+    Time                         1
+    QunatityTemperature          1
+
+--- Valid ---
+  Records : 38
+  Spans   : 25
+  Avg len : 53.3 chars
+  Label counts:
+    LocationCountry              16
+    Organization                 4
+    QuantityPrice                2
+    QuantityAge                  2
+    TimeDuration                 1
+
+Converted 341/341 train records
+Converted 38/38 valid records
+
+Loading base model: urchade/gliner_small-v2 ¡¦
+[WARN] GLiNER Trainer API failed (ValueError("too many dimensions 'str'")); falling back to manual training loop. Check that your gliner version (>=0.2.22) is installed and the training data is in the correct word-span format.
+[WARN] Collation failed for batch at index 0: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 4: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 8: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 12: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 16: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 20: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 24: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 28: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 32: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 36: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 40: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 44: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 48: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 52: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 56: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 60: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 64: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 68: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 72: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 76: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 80: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 84: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 88: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 92: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 96: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 100: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 104: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 108: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 112: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 116: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 120: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 124: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 128: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 132: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 136: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 140: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 144: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 148: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 152: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 156: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 160: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 164: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 168: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 172: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 176: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 180: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 184: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 188: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 192: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 196: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 200: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 204: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 208: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 212: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 216: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 220: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 224: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 228: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 232: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 236: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 240: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 244: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 248: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 252: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 256: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 260: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 264: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 268: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 272: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 276: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 280: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 284: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 288: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 292: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 296: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 300: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 304: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 308: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 312: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 316: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 320: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 324: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 328: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 332: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 336: 'list' object has no attribute 'squeeze'
+[WARN] Collation failed for batch at index 340: 'list' object has no attribute 'squeeze'

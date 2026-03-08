@@ -1,0 +1,12 @@
+Loading model from outputs\run2\final ¡¦
+Evaluating on 38 records ¡¦
+
+Label                              P       R      F1     TP     FP     FN
+------------------------------------------------------------------------
+OVERALL                        0.000   0.000   0.000      0      0     25
+------------------------------------------------------------------------
+  LocationCountry              0.000   0.000   0.000      0      0     16
+  Organization                 0.000   0.000   0.000      0      0      4
+  QuantityAge                  0.000   0.000   0.000      0      0      2
+  QuantityPrice                0.000   0.000   0.000      0      0      2
+  TimeDuration                 0.000   0.000   0.000      0      0      1

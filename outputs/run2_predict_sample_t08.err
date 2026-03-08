@@ -1,0 +1,3 @@
+config.json not found in C:\Users\sungw\git_repo\GLiNER_Finetuning\outputs\run2\final
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+Asking to truncate to max_length but no maximum length is provided and the model has no predefined maximum length. Default to no truncation.

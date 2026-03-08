@@ -1,0 +1,24 @@
+Loading model from outputs\run2\final ¡¦
+Evaluating on 38 records ¡¦
+
+Label                              P       R      F1     TP     FP     FN
+------------------------------------------------------------------------
+OVERALL                        0.002   0.040   0.004      1    451     24
+------------------------------------------------------------------------
+  Date                         0.000   0.000   0.000      0     12      0
+  DateDuraion                  0.000   0.000   0.000      0      2      0
+  Event                        0.000   0.000   0.000      0     13      0
+  EventFestival                0.000   0.000   0.000      0      1      0
+  EventSports                  0.000   0.000   0.000      0      3      0
+  Location                     0.000   0.000   0.000      0     43      0
+  LocationCity                 0.000   0.000   0.000      0      4      0
+  LocationCountry              0.250   0.062   0.100      1      3     15
+  Organization                 0.000   0.000   0.000      0      9      4
+  Person                       0.000   0.000   0.000      0      5      0
+  Quantity                     0.000   0.000   0.000      0    206      0
+  QuantityAge                  0.000   0.000   0.000      0     14      2
+  QuantityPrice                0.000   0.000   0.000      0     36      2
+  Sports                       0.000   0.000   0.000      0      1      0
+  TermSports                   0.000   0.000   0.000      0      3      0
+  Time                         0.000   0.000   0.000      0     52      0
+  TimeDuration                 0.000   0.000   0.000      0     44      1
