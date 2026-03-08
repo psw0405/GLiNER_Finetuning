@@ -1,0 +1,46 @@
+{
+  "model_dir": "outputs\\run2\\final",
+  "onnx_file": "model.onnx",
+  "span_mode": "markerV0",
+  "input_names": [
+    "input_ids",
+    "attention_mask",
+    "words_mask",
+    "text_lengths",
+    "span_idx",
+    "span_mask"
+  ],
+  "output_names": [
+    "logits"
+  ],
+  "labels_count": 26,
+  "labels_file": "labels.json",
+  "copied_assets": [
+    "gliner_config.json",
+    "run_config.json",
+    "spm.model",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "special_tokens_map.json",
+    "added_tokens.json"
+  ],
+  "sample_text": "삼성전자는 2026년 3월 8일 서울에서 신제품을 공개했다.",
+  "opset": 17,
+  "threshold": 0.5,
+  "verification": {
+    "torch_shape": [
+      1,
+      8,
+      12,
+      26
+    ],
+    "onnx_shape": [
+      1,
+      8,
+      12,
+      26
+    ],
+    "max_abs_diff": 1.7285346984863281e-06,
+    "mean_abs_diff": 2.04545585802407e-07
+  }
+}
