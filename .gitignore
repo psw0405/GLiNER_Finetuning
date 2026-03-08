@@ -12,3 +12,6 @@ data/*.xlsx
 outputs/
 !outputs/.gitkeep
 !data/.gitkeep
+onnx/cpp/build/
+onnx/cpp/build-vs/
+onnx/export_onnx.log
