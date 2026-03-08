@@ -253,6 +253,11 @@ Training saves:
 - `outputs/run1/checkpoint-epoch{N}/` – per-epoch checkpoints
 - `outputs/run1/final/` – final model weights + config + `run_config.json`
 
+Operational rule:
+- `checkpoint-epoch{N}` folders are intermediate snapshots for resume/debugging.
+- They are **not merged** to create `final`.
+- For evaluation/inference, always use `outputs/<run>/final`.
+
 ### Evaluation
 
 ```bash

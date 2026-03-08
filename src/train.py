@@ -14,6 +14,7 @@ word-level spans, which is the format GLiNER's Trainer expects.
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import random
 import re
@@ -241,29 +242,54 @@ def _train_via_trainer(
 ) -> None:
     """Use GLiNER's built-in Trainer if available."""
     from gliner.training import Trainer, TrainingArguments  # noqa: PLC0415
+    from gliner.data_processing.collator import DataCollator  # noqa: PLC0415
 
-    training_args = TrainingArguments(
-        output_dir=str(output_dir),
-        learning_rate=lr,
-        weight_decay=0.01,
-        others_lr=lr * 2,
-        others_weight_decay=0.01,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.1,
-        per_device_train_batch_size=batch_size,
-        per_device_eval_batch_size=batch_size,
-        num_train_epochs=epochs,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        save_total_limit=1,
-        dataloader_num_workers=0,
-        fp16=False,
-        bf16=False,
-        no_cuda=True,
-        use_cpu=True,
-        seed=seed,
-        report_to="none",
-        logging_steps=10,
+    arg_params = inspect.signature(TrainingArguments.__init__).parameters
+    train_kwargs: dict[str, Any] = {
+        "output_dir": str(output_dir),
+        "learning_rate": lr,
+        "weight_decay": 0.01,
+        "others_lr": lr * 2,
+        "others_weight_decay": 0.01,
+        "lr_scheduler_type": "cosine",
+        "warmup_ratio": 0.1,
+        "per_device_train_batch_size": batch_size,
+        "per_device_eval_batch_size": batch_size,
+        "num_train_epochs": epochs,
+        "save_strategy": "epoch",
+        "save_total_limit": 1,
+        "dataloader_num_workers": 0,
+        "fp16": False,
+        "bf16": False,
+        "seed": seed,
+        "report_to": "none",
+        "logging_steps": 10,
+        "remove_unused_columns": False,
+    }
+
+    # Transformers / GLiNER version compatibility.
+    if "evaluation_strategy" in arg_params:
+        train_kwargs["evaluation_strategy"] = "epoch"
+    elif "eval_strategy" in arg_params:
+        train_kwargs["eval_strategy"] = "epoch"
+
+    if "no_cuda" in arg_params:
+        train_kwargs["no_cuda"] = True
+    elif "use_cpu" in arg_params:
+        train_kwargs["use_cpu"] = True
+
+    if "do_train" in arg_params:
+        train_kwargs["do_train"] = True
+    if "do_eval" in arg_params:
+        train_kwargs["do_eval"] = True
+
+    filtered_kwargs = {k: v for k, v in train_kwargs.items() if k in arg_params}
+    training_args = TrainingArguments(**filtered_kwargs)
+
+    data_collator = DataCollator(
+        model.config,
+        data_processor=getattr(model, "data_processor", None),
+        prepare_labels=True,
     )
 
     trainer = Trainer(
@@ -271,8 +297,16 @@ def _train_via_trainer(
         args=training_args,
         train_dataset=train_data,
         eval_dataset=valid_data,
+        data_collator=data_collator,
     )
     trainer.train()
+
+    global_step = getattr(getattr(trainer, "state", None), "global_step", None)
+    if isinstance(global_step, int) and global_step == 0:
+        raise RuntimeError(
+            "GLiNER Trainer finished with zero optimization steps. "
+            "Falling back to manual loop."
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -290,9 +324,13 @@ def _train_manual(
     seed: int,
 ) -> None:
     """Minimal manual PyTorch training loop using GLiNER's data collator."""
-    from gliner.data_processing.collator import DataCollatorWithPadding  # noqa: PLC0415
+    from gliner.data_processing.collator import DataCollator  # noqa: PLC0415
 
-    collator = DataCollatorWithPadding(model.config)
+    collator = DataCollator(
+        model.config,
+        data_processor=getattr(model, "data_processor", None),
+        prepare_labels=True,
+    )
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=0.01)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -300,12 +338,15 @@ def _train_manual(
     )
 
     model.train()
+    total_steps = 0
     for epoch in range(1, epochs + 1):
         # Shuffle each epoch
         indices = list(range(len(train_data)))
         random.shuffle(indices)
         epoch_loss = 0.0
         steps = 0
+        collate_failures = 0
+        forward_failures = 0
 
         for batch_start in range(0, len(indices), batch_size):
             batch_indices = indices[batch_start : batch_start + batch_size]
@@ -315,6 +356,7 @@ def _train_manual(
                 batch = collator(batch_records)
             except Exception as collate_exc:  # noqa: BLE001
                 print(f"[WARN] Collation failed for batch at index {batch_start}: {collate_exc}")
+                collate_failures += 1
                 continue
 
             # Move tensors to device (CPU)
@@ -333,6 +375,7 @@ def _train_manual(
                     loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
                 except Exception as fwd_exc:  # noqa: BLE001
                     print(f"[WARN] Forward pass failed at batch {batch_start}: {fwd_exc}")
+                    forward_failures += 1
                     continue
 
             loss.backward()
@@ -342,6 +385,15 @@ def _train_manual(
 
             epoch_loss += loss.item()
             steps += 1
+            total_steps += 1
+
+        if steps == 0:
+            raise RuntimeError(
+                "Manual training loop executed zero optimization steps in an epoch. "
+                f"collate_failures={collate_failures}, "
+                f"forward_failures={forward_failures}, "
+                f"records={len(train_data)}, batch_size={batch_size}."
+            )
 
         avg_loss = epoch_loss / max(steps, 1)
         print(f"  Epoch {epoch}/{epochs}  loss={avg_loss:.4f}")
@@ -350,6 +402,9 @@ def _train_manual(
         ckpt_dir = output_dir / f"checkpoint-epoch{epoch}"
         ckpt_dir.mkdir(parents=True, exist_ok=True)
         model.save_pretrained(str(ckpt_dir))
+
+    if total_steps == 0:
+        raise RuntimeError("Manual training loop completed with zero optimization steps.")
 
 
 # ---------------------------------------------------------------------------
