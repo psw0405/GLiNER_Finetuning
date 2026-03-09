@@ -13,12 +13,12 @@ LABELS: list[str] = [
     "Shop",
     "CultureSite",
     "Building",
-    "DateDuraion",        # intentional spelling (non-time durations: days/weeks/months/years)
+    "Duraion",        # intentional spelling (non-time durations: days/weeks/months/years)
     "TimeDuration",
     "Sports",
     "Food",
-    "CivilizationCurrency",
-    "CivilizationLaw",
+    "Currency",
+    "Law",
     "QuantityAge",
     "QunatityTemperature", # intentional spelling (temperature values)
     "QuantityPrice",
@@ -29,3 +29,20 @@ LABELS: list[str] = [
 ]
 
 LABEL_SET: set[str] = set(LABELS)
+
+
+LABEL_ALIASES: dict[str, str] = {
+    "DateDuraion": "Duraion",
+    "DateDuration": "Duraion",
+    "QuantityMoney": "QuantityPrice",
+    "QuantityTemperature": "QunatityTemperature",
+    "TermDisease": "TermMedical",
+    "CulturalAsset": "CultureSite",
+    "CivilizationCurrency": "Currency",
+    "CivilizationLaw": "Law",
+}
+
+
+def normalize_label(label: str) -> str:
+    """Map legacy/alias labels to canonical labels used by this project."""
+    return LABEL_ALIASES.get(label, label)
