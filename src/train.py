@@ -14,6 +14,7 @@ word-level spans, which is the format GLiNER's Trainer expects.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import inspect
 import json
 import random
@@ -26,7 +27,7 @@ import numpy as np
 import torch
 
 from src.dataio import dataset_stats, load_jsonl, print_stats, validate_records
-from src.labels import LABELS
+from src.labels import LABELS, LABEL_SET, normalize_label
 
 
 # ---------------------------------------------------------------------------
@@ -95,7 +96,7 @@ def convert_record(record: dict[str, Any]) -> dict[str, Any] | None:
         )
         if result is not None:
             ws, we = result
-            ner.append([ws, we, ent["label"]])
+            ner.append([ws, we, normalize_label(ent["label"])])
 
     return {"tokenized_text": words, "ner": ner}
 
@@ -108,6 +109,43 @@ def prepare_gliner_data(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if gliner_rec is not None:
             converted.append(gliner_rec)
     return converted
+
+
+def normalize_entity_labels(
+    records: list[dict[str, Any]],
+    source_name: str,
+) -> tuple[int, dict[str, int]]:
+    """Normalize entity labels in-place and return (changed_count, unknown_counts)."""
+    changed_count = 0
+    unknown_counts: Counter[str] = Counter()
+
+    for record in records:
+        entities = record.get("entities", [])
+        if not isinstance(entities, list):
+            continue
+
+        for ent in entities:
+            label = ent.get("label")
+            if not isinstance(label, str):
+                continue
+
+            normalized = normalize_label(label)
+            if normalized != label:
+                ent["label"] = normalized
+                changed_count += 1
+
+            if normalized not in LABEL_SET:
+                unknown_counts[normalized] += 1
+
+    if changed_count:
+        print(f"Normalized {changed_count} label(s) in {source_name}")
+
+    if unknown_counts:
+        print(f"[WARN] Unknown labels remain in {source_name} after normalization:")
+        for label, count in unknown_counts.most_common(20):
+            print(f"  - {label}: {count}")
+
+    return changed_count, dict(unknown_counts)
 
 
 # ---------------------------------------------------------------------------
@@ -133,6 +171,9 @@ def train(
     print("Loading training data …")
     train_records = load_jsonl(train_path)
     valid_records = load_jsonl(valid_path)
+
+    normalize_entity_labels(train_records, str(train_path))
+    normalize_entity_labels(valid_records, str(valid_path))
 
     for records, name in [(train_records, str(train_path)), (valid_records, str(valid_path))]:
         errors = validate_records(records, source_name=name)

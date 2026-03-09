@@ -15,7 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from src.dataio import load_jsonl
-from src.labels import LABELS
+from src.labels import LABELS, normalize_label
 
 
 # ---------------------------------------------------------------------------
@@ -25,7 +25,7 @@ from src.labels import LABELS
 def _gold_spans(record: dict) -> set[tuple[int, int, str]]:
     """Return set of (start, end, label) from a character-span record."""
     return {
-        (int(e["start"]), int(e["end"]), e["label"])
+        (int(e["start"]), int(e["end"]), normalize_label(e["label"]))
         for e in record.get("entities", [])
     }
 
@@ -41,7 +41,7 @@ def _pred_spans(
     spans = set()
     for ent in entities:
         # GLiNER returns character-level start/end
-        spans.add((ent["start"], ent["end"], ent["label"]))
+        spans.add((ent["start"], ent["end"], normalize_label(ent["label"])))
     return spans
 
 
