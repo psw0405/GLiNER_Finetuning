@@ -114,6 +114,22 @@ cmake -S . -B build \
 ./build/gliner_tizen_demo ../../onnx "삼성전자는 서울에서 신제품을 공개했다." 0.5 1 0
 ```
 
+Zero-shot 라벨을 런타임에 넣고 싶다면 JSON 배열 파일을 마지막 인자로 전달할 수 있습니다.
+
+예: `custom_labels.json`
+
+```json
+[
+   "Company",
+   "Product",
+   "LaunchDate"
+]
+```
+
+```bash
+./build/gliner_tizen_demo ../../onnx "삼성전자는 서울에서 신제품을 공개했다." 0.5 1 0 ./custom_labels.json
+```
+
 출력은 JSON 배열이며 각 항목은 `start`, `end`, `label`, `text`, `score`를 포함합니다.
 
 ## 5) Python vs C++ Parity 자동 비교

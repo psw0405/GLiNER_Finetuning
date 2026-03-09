@@ -29,7 +29,17 @@ class GlinerOnnxInfer {
 public:
     explicit GlinerOnnxInfer(const std::string& model_dir, const std::string& onnx_file = "model.onnx");
     std::vector<Entity> Predict(const std::string& text, const InferOptions& options = InferOptions()) const;
+    std::vector<Entity> Predict(
+        const std::string& text,
+        const std::vector<std::string>& labels,
+        const InferOptions& options = InferOptions()
+    ) const;
     std::vector<std::vector<Entity>> PredictBatch(const std::vector<std::string>& texts, const InferOptions& options = InferOptions()) const;
+    std::vector<std::vector<Entity>> PredictBatch(
+        const std::vector<std::string>& texts,
+        const std::vector<std::string>& labels,
+        const InferOptions& options = InferOptions()
+    ) const;
 
 private:
     struct TokenSpan {
@@ -72,13 +82,14 @@ private:
     std::vector<TokenSpan> SplitWords(const std::string& text, const std::vector<Utf8Codepoint>& cps) const;
     std::vector<int64_t> EncodeWord(const std::string& word) const;
 
-    PreparedExample PrepareExample(const std::string& text) const;
+    PreparedExample PrepareExample(const std::string& text, const std::vector<std::string>& labels) const;
     std::vector<Entity> DecodeSpans(
         const PreparedExample& ex,
         const float* logits,
         int64_t words_dim,
         int64_t max_width_dim,
         int64_t num_classes_dim,
+        const std::vector<std::string>& labels,
         const InferOptions& options
     ) const;
 
