@@ -9,6 +9,7 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <unordered_set>
 
 #include <nlohmann/json.hpp>
 
@@ -32,6 +33,24 @@ json ReadJson(const std::filesystem::path& path) {
     return json::parse(ReadTextFile(path));
 }
 
+void ValidateLabels(const std::vector<std::string>& labels, const std::string& context) {
+    if (labels.empty()) {
+        throw std::runtime_error(context + " labels must not be empty.");
+    }
+
+    std::unordered_set<std::string> seen;
+    seen.reserve(labels.size());
+
+    for (const auto& label : labels) {
+        if (label.empty()) {
+            throw std::runtime_error(context + " labels contain an empty string.");
+        }
+        if (!seen.insert(label).second) {
+            throw std::runtime_error(context + " labels contain duplicate entry: " + label);
+        }
+    }
+}
+
 }
 
 GlinerOnnxInfer::GlinerOnnxInfer(const std::string& model_dir, const std::string& onnx_file)
@@ -44,7 +63,19 @@ GlinerOnnxInfer::GlinerOnnxInfer(const std::string& model_dir, const std::string
 }
 
 std::vector<Entity> GlinerOnnxInfer::Predict(const std::string& text, const InferOptions& options) const {
-    auto batch = PredictBatch(std::vector<std::string>{text}, options);
+    auto batch = PredictBatch(std::vector<std::string>{text}, labels_, options);
+    if (batch.empty()) {
+        return {};
+    }
+    return std::move(batch[0]);
+}
+
+std::vector<Entity> GlinerOnnxInfer::Predict(
+    const std::string& text,
+    const std::vector<std::string>& labels,
+    const InferOptions& options
+) const {
+    auto batch = PredictBatch(std::vector<std::string>{text}, labels, options);
     if (batch.empty()) {
         return {};
     }
@@ -55,9 +86,19 @@ std::vector<std::vector<Entity>> GlinerOnnxInfer::PredictBatch(
     const std::vector<std::string>& texts,
     const InferOptions& options
 ) const {
+    return PredictBatch(texts, labels_, options);
+}
+
+std::vector<std::vector<Entity>> GlinerOnnxInfer::PredictBatch(
+    const std::vector<std::string>& texts,
+    const std::vector<std::string>& labels,
+    const InferOptions& options
+) const {
     if (texts.empty()) {
         return {};
     }
+
+    ValidateLabels(labels, "PredictBatch");
 
     std::vector<PreparedExample> prepared;
     prepared.reserve(texts.size());
@@ -65,7 +106,7 @@ std::vector<std::vector<Entity>> GlinerOnnxInfer::PredictBatch(
     int64_t max_spans = 0;
 
     for (const auto& text : texts) {
-        PreparedExample ex = PrepareExample(text);
+        PreparedExample ex = PrepareExample(text, labels);
         max_seq_len = std::max<int64_t>(max_seq_len, static_cast<int64_t>(ex.input_ids.size()));
         max_spans = std::max<int64_t>(max_spans, static_cast<int64_t>(ex.span_mask.size()));
         prepared.push_back(std::move(ex));
@@ -174,6 +215,14 @@ std::vector<std::vector<Entity>> GlinerOnnxInfer::PredictBatch(
     if (out_batch != batch_size) {
         throw std::runtime_error("Output batch size mismatch.");
     }
+    if (out_num_classes != static_cast<int64_t>(labels.size())) {
+        throw std::runtime_error(
+            "Output class dimension mismatch. "
+            "logits classes=" + std::to_string(out_num_classes)
+            + ", requested labels=" + std::to_string(labels.size())
+            + ". Re-export ONNX for dynamic labels or pass matching label count."
+        );
+    }
 
     const float* logits = outputs[0].GetTensorData<float>();
 
@@ -190,6 +239,7 @@ std::vector<std::vector<Entity>> GlinerOnnxInfer::PredictBatch(
             out_words,
             out_max_width,
             out_num_classes,
+            labels,
             options
         );
         all_entities.push_back(std::move(entities));
@@ -213,6 +263,7 @@ void GlinerOnnxInfer::LoadAssets(const std::string& model_dir) {
     for (const auto& item : labels_json) {
         labels_.push_back(item.get<std::string>());
     }
+    ValidateLabels(labels_, "labels.json");
 
     if (!sp_.Load(spm_path.string()).ok()) {
         throw std::runtime_error("Failed to load sentencepiece model: " + spm_path.string());
@@ -441,7 +492,10 @@ std::vector<int64_t> GlinerOnnxInfer::EncodeWord(const std::string& word) const 
     return out;
 }
 
-GlinerOnnxInfer::PreparedExample GlinerOnnxInfer::PrepareExample(const std::string& text) const {
+GlinerOnnxInfer::PreparedExample GlinerOnnxInfer::PrepareExample(
+    const std::string& text,
+    const std::vector<std::string>& labels
+) const {
     PreparedExample ex;
     ex.text = text;
 
@@ -452,9 +506,9 @@ GlinerOnnxInfer::PreparedExample GlinerOnnxInfer::PrepareExample(const std::stri
     }
 
     std::vector<std::string> words;
-    words.reserve(labels_.size() * 2 + 1 + ex.tokens.size());
+    words.reserve(labels.size() * 2 + 1 + ex.tokens.size());
 
-    for (const auto& label : labels_) {
+    for (const auto& label : labels) {
         words.push_back(ent_token_);
         words.push_back(label);
     }
@@ -534,6 +588,7 @@ std::vector<Entity> GlinerOnnxInfer::DecodeSpans(
     int64_t words_dim,
     int64_t max_width_dim,
     int64_t num_classes_dim,
+    const std::vector<std::string>& labels,
     const InferOptions& options
 ) const {
     std::vector<SpanCandidate> candidates;
@@ -571,7 +626,7 @@ std::vector<Entity> GlinerOnnxInfer::DecodeSpans(
         if (span.start < 0 || span.end < span.start || span.end >= static_cast<int32_t>(ex.tokens.size())) {
             continue;
         }
-        if (span.label_index < 0 || span.label_index >= static_cast<int32_t>(labels_.size())) {
+        if (span.label_index < 0 || span.label_index >= static_cast<int32_t>(labels.size())) {
             continue;
         }
 
@@ -591,7 +646,7 @@ std::vector<Entity> GlinerOnnxInfer::DecodeSpans(
         entities.push_back(Entity{
             start_char,
             end_char,
-            labels_[static_cast<size_t>(span.label_index)],
+            labels[static_cast<size_t>(span.label_index)],
             ex.text.substr(start_byte, end_byte - start_byte),
             span.score,
         });

@@ -1,8 +1,10 @@
 #include "gliner_tizen_infer.hpp"
 
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -15,13 +17,46 @@ namespace {
 void PrintUsage() {
     std::cerr
         << "Usage:\n"
-        << "  gliner_tizen_demo <model_dir> <text> [threshold] [flat_ner] [multi_label]\n\n"
+        << "  gliner_tizen_demo <model_dir> <text> [threshold] [flat_ner] [multi_label] [labels_json]\n\n"
         << "Args:\n"
         << "  model_dir   Directory containing model.onnx, labels.json, spm.model, tokenizer files\n"
         << "  text        Input text (UTF-8)\n"
         << "  threshold   Optional score threshold (default: 0.5)\n"
         << "  flat_ner    Optional 1/0 (default: 1)\n"
-        << "  multi_label Optional 1/0 (default: 0)\n";
+        << "  multi_label Optional 1/0 (default: 0)\n"
+        << "  labels_json Optional path to zero-shot labels JSON array\n";
+}
+
+std::vector<std::string> LoadLabelsFromFile(const std::string& labels_path) {
+    std::ifstream ifs(labels_path, std::ios::in | std::ios::binary);
+    if (!ifs) {
+        throw std::runtime_error("Failed to open labels file: " + labels_path);
+    }
+
+    const nlohmann::json parsed = nlohmann::json::parse(ifs);
+    if (!parsed.is_array()) {
+        throw std::runtime_error("labels_json must be a JSON array of strings: " + labels_path);
+    }
+
+    std::vector<std::string> labels;
+    labels.reserve(parsed.size());
+
+    for (const auto& item : parsed) {
+        if (!item.is_string()) {
+            throw std::runtime_error("labels_json must contain only strings: " + labels_path);
+        }
+        const std::string label = item.get<std::string>();
+        if (label.empty()) {
+            throw std::runtime_error("labels_json contains an empty label: " + labels_path);
+        }
+        labels.push_back(label);
+    }
+
+    if (labels.empty()) {
+        throw std::runtime_error("labels_json must not be empty: " + labels_path);
+    }
+
+    return labels;
 }
 
 }
@@ -48,7 +83,13 @@ int main(int argc, char** argv) {
 
     try {
         GlinerOnnxInfer infer(model_dir, "model.onnx");
-        std::vector<Entity> entities = infer.Predict(text, options);
+        std::vector<Entity> entities;
+        if (argc >= 7) {
+            std::vector<std::string> labels = LoadLabelsFromFile(argv[6]);
+            entities = infer.Predict(text, labels, options);
+        } else {
+            entities = infer.Predict(text, options);
+        }
 
         nlohmann::json out = nlohmann::json::array();
         for (const auto& e : entities) {

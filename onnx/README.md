@@ -114,6 +114,24 @@ cmake -S . -B build \
 ./build/gliner_tizen_demo ../../onnx "삼성전자는 서울에서 신제품을 공개했다." 0.5 1 0
 ```
 
+Zero-shot 라벨을 런타임에 넣고 싶다면 JSON 배열 파일을 마지막 인자로 전달할 수 있습니다.
+
+예: `custom_labels.json`
+
+```json
+[
+   "Company",
+   "Product",
+   "LaunchDate"
+]
+```
+
+```bash
+./build/gliner_tizen_demo ../../onnx "삼성전자는 서울에서 신제품을 공개했다." 0.5 1 0 ./custom_labels.json
+```
+
+주의: 현재 `model.onnx`가 고정 class 차원으로 export된 경우, `labels_json` 개수는 ONNX 출력 class 수와 같아야 합니다.
+
 출력은 JSON 배열이며 각 항목은 `start`, `end`, `label`, `text`, `score`를 포함합니다.
 
 ## 5) Python vs C++ Parity 자동 비교
@@ -143,6 +161,15 @@ python onnx/parity_test.py \
 python onnx/parity_test.py \
    --model_dir onnx \
    --cpp_bin onnx/cpp/build/gliner_tizen_demo.exe
+```
+
+커스텀 라벨 파일로 parity 비교:
+
+```bash
+python onnx/parity_test.py \
+   --model_dir onnx \
+   --labels_file ./custom_labels.json \
+   --text "삼성전자는 서울에서 신제품을 공개했다."
 ```
 
 불일치 시 exit code 1로 종료하고, 누락 엔티티/score 차이를 출력합니다.
