@@ -19,13 +19,18 @@ class EntityKey:
     text: str
 
 
-def load_labels(model_dir: Path) -> list[str]:
-    labels_path = model_dir / "labels.json"
+def load_labels_file(labels_path: Path) -> list[str]:
     if not labels_path.exists():
-        raise FileNotFoundError(f"labels.json not found: {labels_path}")
+        raise FileNotFoundError(f"labels file not found: {labels_path}")
     labels = json.loads(labels_path.read_text(encoding="utf-8"))
     if not isinstance(labels, list) or not all(isinstance(x, str) for x in labels):
-        raise ValueError(f"labels.json has invalid format: {labels_path}")
+        raise ValueError(f"labels file has invalid format: {labels_path}")
+    if not labels:
+        raise ValueError(f"labels file is empty: {labels_path}")
+    if any(not x for x in labels):
+        raise ValueError(f"labels file contains empty label: {labels_path}")
+    if len(set(labels)) != len(labels):
+        raise ValueError(f"labels file contains duplicate labels: {labels_path}")
     return labels
 
 
@@ -66,6 +71,7 @@ def run_cpp_inference(
     threshold: float,
     flat_ner: bool,
     multi_label: bool,
+    labels_file: Path | None = None,
 ) -> list[dict]:
     cmd = [
         str(cpp_bin),
@@ -75,6 +81,9 @@ def run_cpp_inference(
         "1" if flat_ner else "0",
         "1" if multi_label else "0",
     ]
+    if labels_file is not None:
+        cmd.append(str(labels_file))
+
     proc = subprocess.run(
         cmd,
         check=False,
@@ -195,6 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Compare GLiNER Python vs C++ inference parity.")
     parser.add_argument("--model_dir", type=Path, default=Path("onnx"))
     parser.add_argument("--onnx_file", default="model.onnx")
+    parser.add_argument("--labels_file", type=Path, default=None, help="Labels JSON array file. Defaults to <model_dir>/labels.json")
     parser.add_argument("--cpp_bin", type=Path, default=None)
     parser.add_argument("--cpp_dir", type=Path, default=Path("onnx/cpp"))
     parser.add_argument("--text", action="append", default=None, help="Input text. Can be passed multiple times.")
@@ -215,7 +225,8 @@ def main() -> int:
     if not model_dir.exists():
         raise FileNotFoundError(f"model_dir does not exist: {model_dir}")
 
-    labels = load_labels(model_dir)
+    labels_path = (args.labels_file.resolve() if args.labels_file is not None else (model_dir / "labels.json"))
+    labels = load_labels_file(labels_path)
 
     cpp_bin = args.cpp_bin
     if cpp_bin is None:
@@ -231,6 +242,7 @@ def main() -> int:
 
     print(f"[INFO] model_dir={model_dir}")
     print(f"[INFO] cpp_bin={cpp_bin}")
+    print(f"[INFO] labels_file={labels_path} (count={len(labels)})")
     print(
         "[INFO] options="
         f"threshold={args.threshold}, flat_ner={flat_ner}, multi_label={args.multi_label}, score_tol={args.score_tol}"
@@ -261,6 +273,7 @@ def main() -> int:
             threshold=args.threshold,
             flat_ner=flat_ner,
             multi_label=args.multi_label,
+            labels_file=labels_path,
         )
 
         ok, reason = diff_entities(py_entities, cpp_entities, score_tol=args.score_tol)
